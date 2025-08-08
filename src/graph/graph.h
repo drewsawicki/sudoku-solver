@@ -2,11 +2,14 @@
 #define GRAPH_H
 
 #include <stdbool.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 // Constants
 #define SUDOKU_SIZE 9
 #define TOTAL_CELLS 81
 #define MAX_NEIGHBORS 20
+#define FULL_DOMAIN 0x1FF
 
 typedef struct {
     int from_vertex;
@@ -22,7 +25,7 @@ typedef struct {
     
     // Value information
     int value;      // 0 = empty, 1-9 = filled with that digit
-    bool possible[9];  // possible[i] = true if digit (i+1) can be placed here
+    unsigned short domain; // Possible values, updated via bitmask
     
     // Graph connectivity
     int neighbors[MAX_NEIGHBORS];  // Array of indices of connected vertices
@@ -36,19 +39,15 @@ typedef struct {
 } Graph;
 
 // Function declarations
-Graph* create_graph(void);
+Graph* create_graph(const int puzzle[81]);
 void destroy_graph(Graph* graph);
-void initialize_vertex(Vertex* vertex, int row, int col);
-void add_edge(Graph* graph, int vertex1, int vertex2);
+void initialize_vertex(Vertex* vertex, int row, int col, int value);
 bool are_neighbors(Graph* graph, int vertex1, int vertex2);
 int get_vertex_index(int row, int col);
 void get_row_col(int index, int* row, int* col);
-bool ac3_solve(Graph* graph);
-bool revise(Graph* graph, int vertex1, int vertex2);
-void remove_val_from_domain(Vertex* vertex, int value);
-bool is_arc_consistent(Graph* graph);
 void build_sudoku_edges(Graph* graph);
 bool cells_conflict(int row1, int col1, int row2, int col2);
 int get_box_num(int row, int col);
+int get_domain_from_value(int value);
 
 #endif // GRAPH_H
